@@ -3,32 +3,43 @@
 #include "HashNode.h"
 #include "LinkedList.h"
 
-template<class T>
+template<class ValueType>
 class HashTable
 {
-	typedef HashNode<long long, T>   HashNodeType;
-	typedef LinkedList<HashNodeType> LinkedListType;
-	typedef Node<HashNodeType>       NodeType;
+	typedef long long                    KeyType;
+	typedef HashNode<KeyType, ValueType> HashNodeType;
+	typedef LinkedList<HashNodeType>     LinkedListType;
+	typedef Node<HashNodeType>           NodeType;
 
 private:
-	static const size_t c_bucketsCount = 10000;
+	const double c_loadFactor = 8.5;
+
 	size_t m_entriesCount;
-	LinkedListType m_bucketsArray[c_bucketsCount];
+	size_t m_bucketsCount;
+	LinkedListType* m_bucketsArray;
 
 public:
 	HashTable()
 	{
 		m_entriesCount = 0;
+		m_bucketsCount = 8;
+		m_bucketsArray = new LinkedListType[m_bucketsCount];
 	}
 
-	size_t hash(long long key)
+	~HashTable()
 	{
-		return key % c_bucketsCount;
+		delete[] m_bucketsArray;
 	}
 
-	void insert(long long key, T value)
+	size_t hash(KeyType key)
 	{
-		NodeType** head = &m_bucketsArray[hash(key)].head;
+		return key % m_bucketsCount;
+	}
+
+	void insert(KeyType key, ValueType value)
+	{
+		LinkedListType* bucket = &m_bucketsArray[hash(key)];
+		NodeType** head = &bucket->head;
 		NodeType** current = head;
 		while (*current)
 		{
@@ -39,11 +50,28 @@ public:
 			}
 			current = &((*current)->next);
 		}
-		*head = new NodeType(HashNodeType(key, value), *head);
-		m_entriesCount++;
+		bucket->add(HashNodeType(key, value));
+
+		if ((double)++m_entriesCount / m_bucketsCount > c_loadFactor)
+		{
+			size_t oldCount = m_bucketsCount;
+			m_bucketsCount *= 2;
+			LinkedListType* tmp = new LinkedListType[m_bucketsCount];
+			for (int i = 0; i < oldCount; i++)
+			{
+				NodeType* current = m_bucketsArray[i].head;
+				while (current)
+				{
+					tmp[hash(current->value.key)].add(current->value);
+					current = current->next;
+				}
+			}
+			delete[] m_bucketsArray;
+			m_bucketsArray = tmp;
+		}
 	}
 
-	T* find(long long key)
+	ValueType* find(KeyType key)
 	{
 		NodeType* current = m_bucketsArray[hash(key)].head;
 
@@ -58,7 +86,7 @@ public:
 		return nullptr;
 	}
 
-	void erase(long long key)
+	void erase(KeyType key)
 	{
 		NodeType** current = &m_bucketsArray[hash(key)].head;
 
@@ -77,5 +105,21 @@ public:
 	size_t size()
 	{
 		return m_entriesCount;
+	}
+
+	void print()
+	{
+		for (int i = 0; i < m_bucketsCount; i++)
+		{
+			std::cout << i << ": ";
+			NodeType* current = m_bucketsArray[i].head;
+			while (current)
+			{
+				std::cout << current->value.key << ", ";
+				current = current->next;
+			}
+			std::cout << std::endl;
+		}
+		std::cout << std::endl;
 	}
 };

@@ -21,4 +21,9 @@ struct LinkedList
 			delete current;
 		}
 	}
+
+	void add(T el)
+	{
+		head = new Node<T>(el, head);
+	}
 };
