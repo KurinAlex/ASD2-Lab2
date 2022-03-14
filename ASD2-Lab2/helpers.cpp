@@ -15,3 +15,13 @@ long long generateRandLong()
 	}
 	return num;
 }
+
+std::string generateRandString()
+{
+	std::string s = "";
+	for (int i = 0; i < 10; i++)
+	{
+		s += rand() % 26 + 'A';
+	}
+	return s;
+}

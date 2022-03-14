@@ -147,6 +147,9 @@
     <ClInclude Include="Data.h" />
     <ClInclude Include="HashNode.h" />
     <ClInclude Include="HashTable.h" />
+    <ClInclude Include="HashTableLong.h" />
+    <ClInclude Include="HashTableOpenAdressing.h" />
+    <ClInclude Include="HashTableString.h" />
     <ClInclude Include="helpers.h" />
     <ClInclude Include="LinkedList.h" />
     <ClInclude Include="Node.h" />

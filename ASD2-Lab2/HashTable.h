@@ -3,17 +3,15 @@
 #include "HashNode.h"
 #include "LinkedList.h"
 
-template<class ValueType>
+template<class KeyType, class ValueType>
 class HashTable
 {
-	typedef long long                    KeyType;
 	typedef HashNode<KeyType, ValueType> HashNodeType;
 	typedef LinkedList<HashNodeType>     LinkedListType;
 	typedef Node<HashNodeType>           NodeType;
 
-private:
-	const double c_loadFactor = 8.5;
-
+protected:
+	const double c_loadFactor = 9.65;
 	size_t m_entriesCount;
 	size_t m_bucketsCount;
 	LinkedListType* m_bucketsArray;
@@ -31,10 +29,7 @@ public:
 		delete[] m_bucketsArray;
 	}
 
-	size_t hash(KeyType key)
-	{
-		return key % m_bucketsCount;
-	}
+	virtual size_t hash(KeyType key) = 0;
 
 	void insert(KeyType key, ValueType value)
 	{
@@ -57,7 +52,7 @@ public:
 			size_t oldCount = m_bucketsCount;
 			m_bucketsCount *= 2;
 			LinkedListType* tmp = new LinkedListType[m_bucketsCount];
-			for (int i = 0; i < oldCount; i++)
+			for (size_t i = 0; i < oldCount; i++)
 			{
 				NodeType* current = m_bucketsArray[i].head;
 				while (current)
@@ -71,7 +66,7 @@ public:
 		}
 	}
 
-	ValueType* find(KeyType key)
+	HashNodeType* find(KeyType key)
 	{
 		NodeType* current = m_bucketsArray[hash(key)].head;
 
@@ -79,7 +74,7 @@ public:
 		{
 			if (current->value.key == key)
 			{
-				return &current->value.value;
+				return &current->value;
 			}
 			current = current->next;
 		}
@@ -105,21 +100,5 @@ public:
 	size_t size()
 	{
 		return m_entriesCount;
-	}
-
-	void print()
-	{
-		for (int i = 0; i < m_bucketsCount; i++)
-		{
-			std::cout << i << ": ";
-			NodeType* current = m_bucketsArray[i].head;
-			while (current)
-			{
-				std::cout << current->value.key << ", ";
-				current = current->next;
-			}
-			std::cout << std::endl;
-		}
-		std::cout << std::endl;
 	}
 };
