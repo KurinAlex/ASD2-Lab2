@@ -7,6 +7,12 @@
 template<class ValueType>
 class HashTableString : public HashTable<std::string, ValueType>
 {
+public:
+	HashTableString()
+	{
+		this->m_loadFactor = 10;
+	}
+
 	size_t hash(std::string key) override
 	{
 		int sum = 0;

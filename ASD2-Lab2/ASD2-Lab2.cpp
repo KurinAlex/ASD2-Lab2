@@ -280,9 +280,10 @@ bool testHashTableOpenAdressing()
 int main()
 {
 	srand(time(0));
-	/*testHashTableLong();
+	testHashTableLong();
 	cout << endl;
 	testHashTableString();
-	cout << endl;*/
+	cout << endl;
 	testHashTableOpenAdressing();
+	cin.get();
 }
